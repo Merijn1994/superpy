@@ -1,0 +1,32 @@
+csv data inventory-> 'id', 'product_name', 'buy_date', 'buy_price', 'expiration_date'
+csv data sold-> id,inventory_id,sell_date,sell_price
+
+Command lines
+- buy(specify name, price and expiration date) -> --product-name, --price, --expiration-date
+- sell(specify name and price) -> --product-name, --price
+- report inventory, profit and revenue ->sub commando: (--today, --yesterday)
+- date -> in txt file (define yesterday, today)
+
+report inventory->show:
+- Product Name, Stock, Buy Price, Expiration Date
+
+Product class:
+- id derived from csv data
+- name ->input from cli
+- stock: count same name, price and expiration date in csv inventory
+- buy price/sell price ->input from cli
+- expiration date ->input from cli
+- buy/sell date -> get from txt file
+
+buy 
+- write data to inventory based on class-> id, product name, buy date, buy price,expiration date
+
+sell
+- write data to inventory based on class-> id, inventory id, sell date, sell price
+
+report revenue 
+- sum price of all products sold on specific date
+
+report profit
+- decide profit based on total revenue 
+
