@@ -1,44 +1,57 @@
-import os
 import csv
+import os
+from rich.console import Console
+from rich.table import Table
 
-parent_dir = os.path.dirname(__file__)
-bought_path = os.path.join(parent_dir, 'csv data\\bought.csv')
-sold_path = os.path.join(parent_dir, 'csv data\\sold.csv')
-inventory_output = []
+BOUGHT_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bought.csv'))
+SOLD_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'sold.csv'))
 
-# Function for the report inventory command
-def report_inventory():
-# Read the bought.csv file and put data in dictionaries nested in a list
-    with open(bought_path, 'r', newline='') as csv_file:
-        reader1 = csv.DictReader(csv_file)
-        bought_data_list = list(reader1)
+def get_inventory():
+    bought_items = {}
+    with open(BOUGHT_FILE_PATH, mode='r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            key = (row['product_name'].lower(), float(row['buy_price']), row['expiration_date'])
+            if key not in bought_items:
+                bought_items[key] = {
+                    'bought_ids': set(),
+                    'product_name': row['product_name'].lower(),
+                    'buy_price': float(row['buy_price']),
+                    'expiration_date': row['expiration_date'],
+                    'quantity': 0,
+                }
+            bought_items[key]['quantity'] += 1
+            bought_items[key]['bought_ids'].add(row['id'])
 
-    with open(sold_path, 'r', newline='') as csv_file:
-        reader2 = csv.DictReader(csv_file)
-        sold_data_list = list(reader2)
+    with open(SOLD_FILE_PATH, mode='r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            bought_id = row['bought_id']
+            for item in bought_items.values():
+                if bought_id in item['bought_ids']:
+                    item['quantity'] -= 1
 
-    for bought_data in bought_data_list:
-        for sold_data in sold_data_list:
-            # Iterate through inventory List and find duplicate item  
-            inventory = next(
-                (
-                    item for item in inventory_output if
-                    item["Product Name"] == bought_data['product_name'] and
-                    item["Buy Price"] == bought_data['buy_price'] and
-                    item["Expiration Date"] == bought_data['expiration_date']
-                ), None
-            )
+    inventory = []
+    for item in bought_items.values():
+        if item['quantity'] > 0:
+            inventory.append(item)
+    return inventory
 
-            # Add stock to duplicate or add new product
-            if inventory and bought_data['id'] != sold_data['bought_id']:
-                inventory['Stock'] += 1
-            elif inventory is None and bought_data['id'] != sold_data['bought_id']:
-                inventory_output.append(
-                    {   
-                        'Product Name': bought_data['product_name'],
-                        'Stock': 1,
-                        'Buy Price': bought_data['buy_price'],
-                        'Expiration Date': bought_data['expiration_date']
-                    })
-    print(inventory_output)
-    return inventory_output
+
+def print_inventory(inventory):
+    console = Console()
+    table = Table(show_header=True, header_style="bright_blue")
+    table.add_column("Product Name", style="dim", width=20)
+    table.add_column("Quantity", justify="right", width=10)
+    table.add_column("Buy Price", justify="right", width=15)
+    table.add_column("Expiration Date", justify="right", width=15)
+
+    for item in inventory:
+        table.add_row(
+            item['product_name'],
+            str(item['quantity']),
+            f"{item['buy_price']:.2f}",
+            item['expiration_date']
+        )
+
+    console.print(table)
