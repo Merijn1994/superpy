@@ -2,13 +2,9 @@ import csv
 import os
 
 parent_dir = os.path.dirname(__file__)
-bought_path = os.path.join(parent_dir, 'csv data\\bought.csv')
+bought_path = os.path.join(parent_dir, 'data', 'bought.csv')
 
-def buy_product(buy_date):
-    product_name = input('Product Name: ')
-    buy_price = input('Buy Price: ')
-    expiration_date = input('Expiration Date: ')
-
+def buy_product(product_name, buy_date, buy_price, expiration_date):
     with open(bought_path, 'r') as csv_file:
         reader = csv.DictReader(csv_file)
         data = list(reader)
