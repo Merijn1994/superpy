@@ -1,8 +1,0 @@
-id,product_name,buy_date,buy_price,expiration_date
-0,Orange,2023-02-10,0.7,2023-02-17
-1,Apple,2023-02-10,0.9,2023-02-17
-2,Orange,2023-02-10,0.7,2023-02-17
-3,test1,2023-02-17,2,testdate
-4,test1,2023-02-17,2,testdate
-5,test1,2023-02-17,2,testdate
-6,Banana,2023-02-17,1,2023-02-25
